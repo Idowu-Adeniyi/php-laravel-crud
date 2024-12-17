@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreStudentRequest;
 use App\Http\Requests\UpdateStudentRequest;
 use App\Models\Student;
+use App\Models\Course;
 
 class StudentController extends Controller
 {
@@ -13,16 +14,15 @@ class StudentController extends Controller
      */
     public function index()
     {
-        return view('students.index',[
+        return view('students.index', [
             'students' => Student::all()
         ]);
     }
 
-
     public function trashed()
     {
-        $students = Student::onlyTrashed() -> get();
-        return view('students.trashed',[
+        $students = Student::onlyTrashed()->get();
+        return view('students.trashed', [
             'students' => $students
         ]);
     }
@@ -32,7 +32,8 @@ class StudentController extends Controller
      */
     public function create()
     {
-        return view('students.create');
+        $courses = Course::all();
+        return view('students.create', compact('courses'));
     }
 
     /**
@@ -40,7 +41,8 @@ class StudentController extends Controller
      */
     public function store(StoreStudentRequest $request)
     {
-        Student::create($request->validated());
+        $student = Student::create($request->validated());
+        $student->courses()->attach($request->courses);
         return redirect()->route('students.index');
     }
 
@@ -57,7 +59,8 @@ class StudentController extends Controller
      */
     public function edit(Student $student)
     {
-        return view('students.edit', compact('student'));
+        $courses = Course::all();
+        return view('students.edit', compact('student', 'courses'));
     }
 
     /**
@@ -65,8 +68,9 @@ class StudentController extends Controller
      */
     public function update(UpdateStudentRequest $request, Student $student)
     {
-        $student -> update($request->validated());
-        return redirect() -> route('students.index');
+        $student->update($request->validated());
+        $student->courses()->sync($request->courses);
+        return redirect()->route('students.index');
     }
 
     /**
@@ -75,7 +79,7 @@ class StudentController extends Controller
     public function trash($id)
     {
         Student::destroy($id);
-        return redirect() -> route('students.index');
+        return redirect()->route('students.index');
     }
 
     /**
@@ -83,13 +87,15 @@ class StudentController extends Controller
      */
     public function destroy($id)
     {
-        $student = Student::withTrashed() -> where('id', $id) -> first();
-        $student -> forceDelete();
-        return redirect() -> route('students.trashed');
+        $student = Student::withTrashed()->where('id', $id)->first();
+        $student->forceDelete();
+        return redirect()->route('students.trashed');
     }
-    public function restore($id){
-        $student = Student::withTrashed() -> where('id', $id) -> first();
-        $student ->restore();
-        return redirect() -> route('students.index');
+
+    public function restore($id)
+    {
+        $student = Student::withTrashed()->where('id', $id)->first();
+        $student->restore();
+        return redirect()->route('students.index');
     }
 }

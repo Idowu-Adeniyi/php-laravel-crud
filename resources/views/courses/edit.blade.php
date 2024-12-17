@@ -1,36 +1,27 @@
-@extends('layouts.admin')
-@section('content')
-<div class="row">
-    <div class="col">
-        <h2 class="display-2">
-            Edit a course
-
-        </h2>
-
+<form action="{{ route('students.update', $student->id) }}" method="POST">
+    @csrf
+    @method('PUT')
+    <div>
+        <label for="fname">First Name:</label>
+        <input type="text" id="fname" name="fname" value="{{ $student->fname }}" required>
     </div>
-
-</div>
-<div class="row">
-    <div class="col">
-        <form action="{{ route('courses.store')}}" method="PUT">
-            {{ csrf_field()}}
-                <div class="mb-3">
-                  <label for="webDev" class="form-label">Web Development</label>
-                  <input type="text" class="form-control" id="webDev" name="webDev" value="{{ $course -> webDev}}">
-                </div>
-                <div class="mb-3">
-                  <label for="fullStack" class="form-label">FullStack WebDev</label>
-                  <input type="text" class="form-control" id="fullStack" name="fullStack" value="{{ $course -> fullStack}}">
-                </div>
-                <div class="mb-3">
-                    <label for="proPractice" class="form-label">Professional Practice</label>
-                  <input type="email" class="form-control" id="proPractice" name="proPractice" value="{{ $course -> proPractice}}">
-                </div>
-                <button type="submit" class="btn btn-primary">Update course</button>
-              
-        </form>
-
+    <div>
+        <label for="lname">Last Name:</label>
+        <input type="text" id="lname" name="lname" value="{{ $student->lname }}" required>
     </div>
-
-</div>
-@endsection
+    <div>
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" value="{{ $student->email }}" required>
+    </div>
+    <div>
+        <label for="courses">Courses:</label>
+        @foreach($courses as $course)
+            <div>
+                <input type="checkbox" id="course{{ $course->id }}" name="courses[]" value="{{ $course->id }}"
+                    {{ $student->courses->contains($course->id) ? 'checked' : '' }}>
+                <label for="course{{ $course->id }}">{{ $course->name }}</label>
+            </div>
+        @endforeach
+    </div>
+    <button type="submit">Update</button>
+</form>

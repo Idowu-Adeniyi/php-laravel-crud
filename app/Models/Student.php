@@ -8,7 +8,6 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Student extends Model
 {
-    /** @use HasFactory<\Database\Factories\StudentFactory> */
     use HasFactory;
     use SoftDeletes;
 
@@ -19,4 +18,10 @@ class Student extends Model
         'lname',
         'email'
     ];
+
+    // Many-to-many relationship with Course
+    public function courses()
+    {
+        return $this->belongsToMany(Course::class);
+    }
 }
